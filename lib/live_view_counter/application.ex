@@ -8,17 +8,13 @@ defmodule LiveViewCounter.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Start the app state
-      LiveViewCounter.Count,
-      # Start the Telemetry supervisor
       LiveViewCounterWeb.Telemetry,
-      # Start the PubSub system
       {Phoenix.PubSub, name: LiveViewCounter.PubSub},
+      {Registry, keys: :unique, name: LiveViewCounter.Registry},
+      LiveViewCounter.Count.Supervisor,
+      LiveViewCounter.CounterStore,
       LiveViewCounter.Presence,
-      # Start the Endpoint (http/https)
       LiveViewCounterWeb.Endpoint
-      # Start a worker by calling: LiveViewCounter.Worker.start_link(arg)
-      # {LiveViewCounter.Worker, arg}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

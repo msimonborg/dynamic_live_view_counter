@@ -3,53 +3,65 @@ defmodule LiveViewCounter.Count do
 
   alias Phoenix.PubSub
 
-  @name :count_server
   @pubsub LiveViewCounter.PubSub
-  @start_value 0
+  @registry LiveViewCounter.Registry
 
   # -------  External API (runs in client process) -------
 
-  def topic do
-    "count"
+  def start_link(topic) do
+    GenServer.start_link(__MODULE__, topic, name: via_name(topic))
   end
 
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, @start_value, name: @name)
+  def incr(topic) do
+    GenServer.call(via_name(topic), :incr)
   end
 
-  def incr() do
-    GenServer.call(@name, :incr)
+  def decr(topic) do
+    GenServer.call(via_name(topic), :decr)
   end
 
-  def decr() do
-    GenServer.call(@name, :decr)
+  def current(topic) do
+    GenServer.call(via_name(topic), :current)
   end
 
-  def current() do
-    GenServer.call(@name, :current)
+  def pubsub_service, do: @pubsub
+  def via_name(topic), do: {:via, Registry, {@registry, topic}}
+
+  def whereis(topic) do
+    case Registry.lookup(@registry, topic) do
+      [{pid, nil}] -> pid
+      [] -> nil
+    end
   end
 
   # -------  Implementation  (Runs in GenServer process) -------
 
-  def init(start_count) do
-    {:ok, start_count}
+  @impl true
+  def init(topic) do
+    {:ok, {topic, 0}}
   end
 
-  def handle_call(:current, _from, count) do
-    {:reply, count, count}
+  @impl true
+  def handle_call(:current, _from, {_topic, count} = state) do
+    {:reply, count, state}
   end
 
-  def handle_call(:incr, _from, count) do
-    make_change(count, +1)
+  def handle_call(:topic, _from, {topic, _count} = state) do
+    {:reply, topic, state}
   end
 
-  def handle_call(:decr, _from, count) do
-    make_change(count, -1)
+  @impl true
+  def handle_call(:incr, _from, state) do
+    make_change(state, +1)
   end
 
-  defp make_change(count, change) do
+  def handle_call(:decr, _from, state) do
+    make_change(state, -1)
+  end
+
+  defp make_change({topic, count} = _state, change) do
     new_count = count + change
-    PubSub.broadcast(@pubsub, topic(), {:count, new_count})
-    {:reply, new_count, new_count}
+    PubSub.broadcast(@pubsub, topic, {:count, new_count})
+    {:reply, new_count, {topic, new_count}}
   end
 end
