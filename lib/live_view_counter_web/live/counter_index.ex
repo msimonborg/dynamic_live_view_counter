@@ -10,12 +10,12 @@ defmodule LiveViewCounterWeb.CounterIndex do
   def render(assigns) do
     ~H"""
     <div>
+      <button phx-click="add">Add New</button>
       <ul>
         <%= for counter <- @counters do %>
           <li><a href={counter}><%= format(counter) %></a> - <a href="#" phx-click={"remove:#{counter}"}>delete</a></li>
         <% end %>
       </ul>
-      <button phx-click="add">Add New</button>
     </div>
     """
   end
