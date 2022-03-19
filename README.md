@@ -1,18 +1,8 @@
 # LiveViewCounter
 
-To start your Phoenix server:
+A small test project to learn how to dynamically create and destroy
+LiveView channels with shared state among many users and realtime updates.
 
-  * Install dependencies with `mix deps.get`
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+Built on top of the work in the [Phoenix LiveView Counter Tutorial](https://github.com/dwyl/phoenix-liveview-counter-tutorial)
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+Inspired by an ElixirForum thread: [LiveView + PubSub topics with GenServer to keep state for each](https://elixirforum.com/t/liveview-pubsub-topics-with-genserver-to-keep-state-for-each/46680/3)
