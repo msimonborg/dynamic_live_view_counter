@@ -44,12 +44,14 @@ defmodule LiveViewCounterWeb.Counter do
 
   def handle_event("inc", _, socket) do
     topic = socket.assigns.id |> topic()
-    {:noreply, assign(socket, :val, Count.incr(topic))}
+    :ok = Count.incr(topic)
+    {:noreply, socket}
   end
 
   def handle_event("dec", _, socket) do
     topic = socket.assigns.id |> topic()
-    {:noreply, assign(socket, :val, Count.decr(topic))}
+    :ok = Count.decr(topic)
+    {:noreply, socket}
   end
 
   def handle_info({:count, count}, socket) do

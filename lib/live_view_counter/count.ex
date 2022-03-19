@@ -13,11 +13,11 @@ defmodule LiveViewCounter.Count do
   end
 
   def incr(topic) do
-    GenServer.call(via_name(topic), :incr)
+    GenServer.cast(via_name(topic), :incr)
   end
 
   def decr(topic) do
-    GenServer.call(via_name(topic), :decr)
+    GenServer.cast(via_name(topic), :decr)
   end
 
   def current(topic) do
@@ -46,22 +46,18 @@ defmodule LiveViewCounter.Count do
     {:reply, count, state}
   end
 
-  def handle_call(:topic, _from, {topic, _count} = state) do
-    {:reply, topic, state}
-  end
-
   @impl true
-  def handle_call(:incr, _from, state) do
+  def handle_cast(:incr, state) do
     make_change(state, +1)
   end
 
-  def handle_call(:decr, _from, state) do
+  def handle_cast(:decr, state) do
     make_change(state, -1)
   end
 
   defp make_change({topic, count} = _state, change) do
     new_count = count + change
     PubSub.broadcast(@pubsub, topic, {:count, new_count})
-    {:reply, new_count, {topic, new_count}}
+    {:noreply, {topic, new_count}}
   end
 end
