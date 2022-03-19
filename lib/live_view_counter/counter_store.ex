@@ -27,6 +27,7 @@ defmodule LiveViewCounter.CounterStore do
   end
 
   def pubsub_service, do: @pubsub
+
   def topic, do: @topic
 
   # ---- Server Callbacks ----
@@ -41,19 +42,19 @@ defmodule LiveViewCounter.CounterStore do
     {:reply, counters, state}
   end
 
-  def handle_call(:add, _from, %{new_counter_id: id, counters: counters} = _state) do
+  def handle_call(:add, _from, %{new_counter_id: id, counters: counters}) do
     topic = LiveViewCounterWeb.Counter.topic(id)
-    CountSup.new_count(topic)
+    {:ok, _} = CountSup.new_count(topic)
     new_counters = [topic | counters]
     broadcast(new_counters)
     {:reply, :ok, %{new_counter_id: id + 1, counters: new_counters}}
   end
 
   def handle_call({:remove, topic}, _from, %{counters: counters} = state) do
-    CountSup.stop_count(topic)
     new_counters = List.delete(counters, topic)
-    broadcast({topic, :removed})
     broadcast(new_counters)
+    broadcast({topic, :removed})
+    :ok = CountSup.stop_count(topic)
     {:reply, :ok, %{state | counters: new_counters}}
   end
 
