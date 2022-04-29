@@ -1,7 +1,7 @@
 # LiveViewCounter
 
-A small test project to learn how to dynamically create and destroy
-LiveView channels with shared state among many users and realtime updates.
+A small test LiveView project to learn how to dynamically create and destroy
+arbitrary counter processes that broadcast realtime updates to many users.
 
 Built on top of the work in the [Phoenix LiveView Counter Tutorial](https://github.com/dwyl/phoenix-liveview-counter-tutorial)
 
